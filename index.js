@@ -1,50 +1,54 @@
-// Supports ES6
-// import { create, Whatsapp } from 'venom-bot';
 const venom = require('venom-bot');
+const sendGreetings = require('./menus/option1.js');
 
-venom
-  .create({
-    session: 'session-name', //name of session
-    multidevice: true // for version not multidevice use false.(default: true)
-  })
-  .then((client) => start(client))
-  .catch((erro) => {
-    console.log(erro);
-  });
+
+const venomConfig = {
+  headless: true,
+  useChrome: true,
+  debug: false,
+  logQR: true,
+  browserArgs: ['--no-sandbox'],
+  refreshQR: 15000
+};
+
+venom.create(venomConfig).then((client) => {
+  start(client);
+});
 
 function start(client) {
   client.onMessage((message) => {
-    
-    switch (String(message.body).toUpperCase()) {
-        case 'HI' :
-
-        client
-        .sendText(message.from, '====== MENU ====== \n \n 1. OPÇÃO \n \n 2. OPÇÃO \n \n 3. OPÇÃO')
-            break;
-    
-        default: 
-            if(message.body === '1' ){
-                client
-                    .sendText(message.from, 'Bem Vindo ao menu 1')
-            }else if (message.body === '2'){
-                client
-                    .sendText(message.from, 'Bem Vindo ao menu 2')
-            }else if(message.body === '3'){
-                client
-                    .sendText(message.from, 'Bem vindo ao menu 3')
-            }
-
-            break;
+    switch (message.body) {
+      case '1':
+        sendGreetings(client, message.from);
+        break;
+      case '2':
+        sendInstructions(client, message.from);
+        break;
+      case '3':
+        sendHelp(client, message.from);
+        break;
+      default:
+        sendMenu(client, message.from);
     }
-
-
   });
 }
 
+function sendMenu(client, to) {
+  const menu = `Menu de opções:
+1. Saudações
+2. Instruções
+3. Ajuda`;
 
+  client.sendText(to, menu);
+}
 
+function sendInstructions(client, to) {
+  client.sendText(to, 'Para usar este bot, envie o número da opção desejada.');
+}
 
-
+function sendHelp(client, to) {
+  client.sendText(to, 'Para obter ajuda, entre em contato com o suporte.');
+}
 
 
 
